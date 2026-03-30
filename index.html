@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>Memoir Snap</title>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav">
+    <button onclick="showPage('capture')">📸 Capture</button>
+    <button class="secondary" onclick="showPage('gallery')">🖼️ Gallery</button>
+  </div>
+
+  <div id="capture" class="page active">
+    <h1>New Entry</h1>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <textarea id="note" placeholder="Write something about this moment..."></textarea>
+    <button id="saveBtn">💾 Save Entry</button>
+  </div>
+
+  <div id="gallery" class="page">
+    <h1>Your Memoirs</h1>
+    <div id="galleryList"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

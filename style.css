@@ -1,0 +1,96 @@
+:root {
+  --primary: #28a745;
+  --dark: #343a40;
+  --light: #f4f7f6;
+}
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: var(--light);
+  color: var(--dark);
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px 0;
+  width: 100%;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+button.secondary {
+  background: var(--dark);
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin: 15px 0;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.page {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+.gallery-item {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.gallery-item img {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.gallery-item p {
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+
+.gallery-item small {
+  color: #888;
+  display: block;
+}
