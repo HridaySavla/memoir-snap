@@ -11,20 +11,24 @@
 
 <div class="container">
   <div class="nav">
-    <button onclick="showPage('capture')">📸 Capture</button>
-    <button class="secondary" onclick="showPage('gallery')">🖼️ Gallery</button>
+    <button id="navCapture" onclick="showPage('capture')">📸 New Entry</button>
+    <button id="navGallery" class="secondary" onclick="showPage('gallery')">🖼️ View Gallery</button>
   </div>
 
   <div id="capture" class="page active">
-    <h1>New Entry</h1>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <textarea id="note" placeholder="Write something about this moment..."></textarea>
-    <button id="saveBtn">💾 Save Entry</button>
+    <h1>Capture Moment</h1>
+    <div class="video-container">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" class="hidden"></canvas>
+    </div>
+    <textarea id="note" placeholder="What's happening?"></textarea>
+    <button id="snapBtn">📸 Take Photo</button>
+    <button id="saveBtn" class="hidden">💾 Save Entry</button>
+    <button id="retakeBtn" class="secondary hidden">🔄 Retake</button>
   </div>
 
   <div id="gallery" class="page">
-    <h1>Your Memoirs</h1>
+    <h1>Your Gallery</h1>
     <div id="galleryList"></div>
   </div>
 </div>

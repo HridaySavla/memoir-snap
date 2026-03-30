@@ -3,96 +3,79 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const noteInput = document.getElementById('note');
 const galleryList = document.getElementById('galleryList');
+const snapBtn = document.getElementById('snapBtn');
+const saveBtn = document.getElementById('saveBtn');
+const retakeBtn = document.getElementById('retakeBtn');
 
-// 1. Initialize IndexedDB
+// 1. DB Setup
 const request = indexedDB.open('MemoirDB', 1);
+request.onupgradeneeded = e => e.target.result.createObjectStore('entries', { keyPath: 'id', autoIncrement: true });
+request.onsuccess = e => db = e.target.result;
 
-request.onupgradeneeded = (e) => {
-  db = e.target.result;
-  if (!db.objectStoreNames.contains('entries')) {
-    db.createObjectStore('entries', { keyPath: 'id', autoIncrement: true });
-  }
-};
+// 2. Camera Setup
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+  .then(stream => video.srcObject = stream);
 
-request.onsuccess = (e) => {
-  db = e.target.result;
-};
-
-// 2. Start Camera
-async function startCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: "environment" } 
-    });
-    video.srcObject = stream;
-  } catch (err) {
-    console.error("Camera error:", err);
-    alert("Please enable camera access to use this app.");
-  }
-}
-
-// 3. Save Entry (Photo + Text)
-document.getElementById('saveBtn').onclick = () => {
-  if (!db) return;
-
-  const context = canvas.getContext('2d');
+// 3. Capture Photo Logic
+snapBtn.onclick = () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  context.drawImage(video, 0, 0);
+  canvas.getContext('2d').drawImage(video, 0, 0);
   
+  video.classList.add('hidden');
+  canvas.classList.remove('hidden');
+  snapBtn.classList.add('hidden');
+  saveBtn.classList.remove('hidden');
+  retakeBtn.classList.remove('hidden');
+};
+
+// 4. Retake Logic
+retakeBtn.onclick = () => {
+  video.classList.remove('hidden');
+  canvas.classList.add('hidden');
+  snapBtn.classList.remove('hidden');
+  saveBtn.classList.add('hidden');
+  retakeBtn.classList.add('hidden');
+};
+
+// 5. Save Entry
+saveBtn.onclick = () => {
   const entry = {
     image: canvas.toDataURL('image/jpeg', 0.7),
     text: noteInput.value,
     date: new Date().toLocaleString()
   };
-
-  const transaction = db.transaction(['entries'], 'readwrite');
-  const store = transaction.objectStore('entries');
-  store.add(entry);
-  
-  transaction.oncomplete = () => {
-    alert("Entry Saved!");
+  const tx = db.transaction('entries', 'readwrite');
+  tx.objectStore('entries').add(entry);
+  tx.oncomplete = () => {
     noteInput.value = "";
     showPage('gallery');
   };
 };
 
-// 4. UI Navigation & Gallery Loader
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-  if (pageId === 'gallery') loadGallery();
+  
+  if (pageId === 'capture') {
+    retakeBtn.click(); // Reset camera view automatically
+  } else {
+    loadGallery();
+  }
 }
 
 function loadGallery() {
   galleryList.innerHTML = "";
-  const transaction = db.transaction('entries', 'readonly');
-  const objectStore = transaction.objectStore('entries');
-  
-  objectStore.openCursor(null, 'prev').onsuccess = (e) => {
+  db.transaction('entries').objectStore('entries').openCursor(null, 'prev').onsuccess = e => {
     const cursor = e.target.result;
     if (cursor) {
       const div = document.createElement('div');
       div.className = 'gallery-item';
-      div.innerHTML = `
-        <small>${cursor.value.date}</small>
-        <img src="${cursor.value.image}">
-        <p>${cursor.value.text || "<em>No text added.</em>"}</p>
-      `;
+      div.innerHTML = `<small>${cursor.value.date}</small><img src="${cursor.value.image}"><p>${cursor.value.text}</p>`;
       galleryList.appendChild(div);
       cursor.continue();
-    } else if (galleryList.innerHTML === "") {
-      galleryList.innerHTML = "<p>Your gallery is empty.</p>";
     }
   };
 }
 
-// 5. Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js');
-  });
-}
-
-// Initialize Camera on load
-startCamera();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
